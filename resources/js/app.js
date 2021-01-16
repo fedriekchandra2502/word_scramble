@@ -5,6 +5,7 @@
  */
 
 import router from './router/index'
+import { store } from './store/store'
 
 require('./bootstrap');
 
@@ -32,6 +33,7 @@ Vue.component('header-component', require('./components/Header.vue').default);
 
 
 const app = new Vue({
+    store,
     el: '#app',
     router
 });

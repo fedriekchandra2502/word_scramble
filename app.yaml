@@ -19,7 +19,7 @@ env_variables:
   DB_DATABASE: instance_id
   DB_USERNAME: database_user_name
   DB_PASSWORD: database_password
-  DB_SOCKET: /cloudsql/instance_name QUEUE_DRIVER: database #in case you execute queued jobs MAIL_DRIVER: smtp
+  DB_SOCKET: /cloudsql/instance_name
 
   QUEUE_DRIVER: database #in case you execute queued jobs
   SANCTUM_STATEFUL_DOMAINS: localhost:8000

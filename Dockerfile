@@ -1,4 +1,4 @@
-FROM node:14.15.4-alpine
+FROM node:14.15.4-alpine3.10
 
 FROM composer:1.9.0 as build
 WORKDIR /app

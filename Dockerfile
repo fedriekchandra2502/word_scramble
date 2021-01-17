@@ -1,9 +1,11 @@
+FROM node:14.15.4-alpine
+
 FROM composer:1.9.0 as build
 WORKDIR /app
 COPY . /app
 RUN composer global require hirak/prestissimo && composer install
 
-FROM php:7.3-apache-stretch
+FROM php:7.4-apache
 RUN docker-php-ext-install pdo pdo_mysql
 
 EXPOSE 8080
@@ -14,4 +16,5 @@ RUN chmod 777 -R /var/www/storage/ && \
     echo "Listen 8080" >> /etc/apache2/ports.conf && \
     chown -R www-data:www-data /var/www/ && \
     a2enmod rewrite
-
+RUN /var/www/npm install
+RUN npm run build

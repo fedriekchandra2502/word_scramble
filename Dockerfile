@@ -36,7 +36,7 @@ RUN chmod +rwx /var/www
 
 RUN chmod -R 777 /var/www
 
-RUN apt-get remove nodejs npm \
+RUN apt-get remove nodejs npm -y \
     && apt-get update \
     && apt-get upgrade \
     && curl -sL https://deb.nodesource.com/setup_14.x | bash - \

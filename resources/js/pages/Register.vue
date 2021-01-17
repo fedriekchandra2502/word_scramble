@@ -21,13 +21,13 @@
                             <div class="form-group row">
                                 <label for="password" class="col-md-4 col-form-label text-md-right">Password:</label>
                                 <div class="col-md-6">
-                                    <input v-model="formData.password" type="password" class="form-control" id="password" placeholder="Enter password" name="password" required>
+                                    <input v-model="formData.password" type="password" class="form-control" id="password" minlength="8" placeholder="Enter password" name="password" required>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="password-confirm" class="col-md-4 col-form-label text-md-right">Password:</label>
                                 <div class="col-md-6">
-                                    <input v-model="formData.password_confirmation" type="password" class="form-control" id="password-confirm" placeholder="Confirm password" name="password_confirmation" required>
+                                    <input v-model="formData.password_confirmation" type="password" class="form-control" id="password-confirm" minlength="8" placeholder="Confirm password" name="password_confirmation" required>
                                 </div>
                             </div>
                             <div class="form-group row mb-0">
@@ -56,21 +56,10 @@ export default {
     },
     methods: {
         register() {
-            axios.get('/sanctum/csrf-cookie').then(res => {
-                axios.post('/register',this.formData).then(res => {
-                    console.log(res);
-                    let user = {
-                        id: res.data.id,
-                        name: res.data.name,
-                        email: res.data.email
-                    };
-                    localStorage.setItem("user", JSON.stringify(user));
-                    this.$router.push({name: 'dashboard'});
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-            });
+            this.$store.dispatch('register')
+            .then(res => {
+                this.$router.push({name: 'dashboard'});
+            })
         }
     }
 }

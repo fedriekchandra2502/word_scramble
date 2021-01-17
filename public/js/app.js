@@ -1991,6 +1991,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
@@ -1998,6 +1999,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      loading: true,
       message: '',
       playing: true,
       profile: {
@@ -2019,6 +2021,7 @@ __webpack_require__.r(__webpack_exports__);
     guess: function guess() {
       var _this = this;
 
+      this.loading = true;
       var myAnswer = {
         question_id: this.question.id,
         question: this.question.question,
@@ -2026,6 +2029,7 @@ __webpack_require__.r(__webpack_exports__);
       };
       axios.post('/api/guess', myAnswer).then(function (res) {
         _this.profile.score = res.data.data.score;
+        _this.loading = false;
         _this.playing = false;
         _this.message = res.data.message;
       });
@@ -2033,13 +2037,16 @@ __webpack_require__.r(__webpack_exports__);
     playAgain: function playAgain() {
       var _this2 = this;
 
+      this.answer = '';
+      this.loading = true;
+      this.playing = true;
       axios.get('/api/generate_question').then(function (res) {
         _this2.question.id = res.data.id;
         _this2.question.question = res.data.question;
         _this2.question.hint = res.data.hint;
         _this2.question.score = res.data.score;
         _this2.length = res.data.question.length;
-        _this2.playing = true;
+        _this2.loading = false;
       });
     }
   },
@@ -2052,6 +2059,7 @@ __webpack_require__.r(__webpack_exports__);
       _this3.question.hint = res.data.hint;
       _this3.question.score = res.data.score;
       _this3.length = res.data.question.length;
+      _this3.loading = false;
     });
     axios.get('/api/user').then(function (res) {
       _this3.profile.name = res.data.name;
@@ -2107,9 +2115,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      error: '',
       formData: {
         email: '',
         password: ''
@@ -2124,6 +2134,8 @@ __webpack_require__.r(__webpack_exports__);
         _this.$router.push({
           name: 'dashboard'
         });
+      })["catch"](function (error) {
+        _this.error = error.response.data;
       });
     }
   }
@@ -2290,21 +2302,9 @@ __webpack_require__.r(__webpack_exports__);
     register: function register() {
       var _this = this;
 
-      axios.get('/sanctum/csrf-cookie').then(function (res) {
-        axios.post('/register', _this.formData).then(function (res) {
-          console.log(res);
-          var user = {
-            id: res.data.id,
-            name: res.data.name,
-            email: res.data.email
-          };
-          localStorage.setItem("user", JSON.stringify(user));
-
-          _this.$router.push({
-            name: 'dashboard'
-          });
-        })["catch"](function (error) {
-          console.log(error);
+      this.$store.dispatch('register').then(function (res) {
+        _this.$router.push({
+          name: 'dashboard'
         });
       });
     }
@@ -2728,6 +2728,27 @@ var store = new (vuex__WEBPACK_IMPORTED_MODULE_2___default().Store)({
           localStorage.removeItem('user');
           context.commit('logout');
           reject(error);
+        });
+      });
+    },
+    register: function register(context) {
+      var _this = this;
+
+      return new Promise(function (resolve, reject) {
+        axios__WEBPACK_IMPORTED_MODULE_0___default().get('/sanctum/csrf-cookie').then(function (res) {
+          axios__WEBPACK_IMPORTED_MODULE_0___default().post('/register', _this.formData).then(function (res) {
+            console.log(res);
+            var user = {
+              id: res.data.id,
+              name: res.data.name,
+              email: res.data.email
+            };
+            localStorage.setItem("user", JSON.stringify(user));
+            context.commit('login');
+            resolve(res);
+          })["catch"](function (error) {
+            reject(error);
+          });
         });
       });
     }
@@ -39539,9 +39560,19 @@ var render = function() {
                         }
                       }),
                       _vm._v(" "),
-                      _c("button", { attrs: { type: "submit" } }, [
-                        _vm._v("Guess")
-                      ])
+                      !_vm.loading
+                        ? _c(
+                            "button",
+                            {
+                              attrs: { disabled: _vm.loading, type: "submit" }
+                            },
+                            [_vm._v("Guess")]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.loading
+                        ? _c("div", { staticClass: "spinner-border" })
+                        : _vm._e()
                     ]
                   )
                 ],
@@ -39581,6 +39612,10 @@ var render = function() {
     _c("div", { staticClass: "row justify-content-center" }, [
       _c("div", { staticClass: "col-md-8" }, [
         _c("h3", [_vm._v("Welcome to Word Scramble")]),
+        _vm._v(" "),
+        _vm.error
+          ? _c("p", { staticClass: "text-danger" }, [_vm._v(_vm._s(_vm.error))])
+          : _vm._e(),
         _vm._v(" "),
         _c("div", { staticClass: "card" }, [
           _c("div", { staticClass: "card-header" }, [_vm._v("Login")]),
@@ -39987,6 +40022,7 @@ var render = function() {
                       attrs: {
                         type: "password",
                         id: "password",
+                        minlength: "8",
                         placeholder: "Enter password",
                         name: "password",
                         required: ""
@@ -40032,6 +40068,7 @@ var render = function() {
                       attrs: {
                         type: "password",
                         id: "password-confirm",
+                        minlength: "8",
                         placeholder: "Confirm password",
                         name: "password_confirmation",
                         required: ""

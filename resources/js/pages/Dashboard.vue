@@ -31,7 +31,8 @@
                             </div>
                             <form action="#" @submit.prevent="guess">
                                 <input v-model="answer" type="text" :minlength="length" :maxlength="length">
-                                <button type="submit">Guess</button>
+                                <button v-if="!loading" :disabled="loading" type="submit">Guess</button>
+                                <div v-if="loading" class="spinner-border"></div>
                             </form>
                         </div>
                     </div>
@@ -50,6 +51,7 @@ export default {
     components: { PlayButtonModal },
     data() {
         return {
+            loading: true,
             message: '',
             playing: true,
             profile: {
@@ -69,6 +71,7 @@ export default {
     },
     methods: {
         guess() {
+            this.loading = true
             var myAnswer = {
                 question_id: this.question.id,
                 question: this.question.question,
@@ -76,18 +79,22 @@ export default {
             }
             axios.post('/api/guess', myAnswer).then(res => {
                 this.profile.score = res.data.data.score;
+                this.loading = false;
                 this.playing = false;
                 this.message = res.data.message;
             });
         },
         playAgain() {
+            this.answer = ''
+            this.loading = true
+            this.playing = true
             axios.get('/api/generate_question').then(res => {
                 this.question.id = res.data.id
                 this.question.question = res.data.question
                 this.question.hint = res.data.hint
                 this.question.score = res.data.score
                 this.length = res.data.question.length
-                this.playing = true;
+                this.loading = false
             })
         }
     },
@@ -98,6 +105,7 @@ export default {
             this.question.hint = res.data.hint
             this.question.score = res.data.score
             this.length = res.data.question.length
+            this.loading = false
         })
         axios.get('/api/user').then(res => {
             this.profile.name = res.data.name

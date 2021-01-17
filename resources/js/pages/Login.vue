@@ -3,6 +3,7 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <h3>Welcome to Word Scramble</h3>
+                <p v-if="error" class="text-danger">{{ error }}</p>
                 <div class="card">
                     <div class="card-header">Login</div>
                     <div class="card-body">
@@ -35,6 +36,7 @@
 export default {
     data() {
         return {
+            error: '',
             formData: {
                 email: '',
                 password: ''
@@ -46,6 +48,9 @@ export default {
             this.$store.dispatch('login',this.formData)
             .then(res => {
                 this.$router.push({name: 'dashboard'});
+            })
+            .catch(error => {
+                this.error = error.response.data;
             })
         }
     }

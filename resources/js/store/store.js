@@ -63,6 +63,26 @@ export const store = new Vuex.Store({
                     reject(error)
                 })
             })
+        },
+        register(context) {
+            return new Promise((resolve, reject) => {
+                axios.get('/sanctum/csrf-cookie').then(res => {
+                    axios.post('/register',this.formData).then(res => {
+                        console.log(res);
+                        let user = {
+                            id: res.data.id,
+                            name: res.data.name,
+                            email: res.data.email
+                        };
+                        localStorage.setItem("user", JSON.stringify(user));
+                        context.commit('login')
+                        resolve(res)
+                    })
+                    .catch(error => {
+                        reject(error)
+                    });
+                });
+            })
         }
     }
 })

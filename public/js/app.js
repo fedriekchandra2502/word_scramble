@@ -40144,7 +40144,7 @@ var render = function() {
               _vm._v(" "),
               _vm._l(_vm.errors, function(error) {
                 return _c("p", { key: error, staticClass: "text-danger" }, [
-                  _vm._v(_vm._s(error))
+                  _vm._v("*" + _vm._s(error))
                 ])
               })
             ],

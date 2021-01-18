@@ -36,7 +36,7 @@
                                 </div>
                             </div>
                         </form>
-                        <p v-for="error in errors" :key="error" class="text-danger">{{ error }}</p>
+                        <p v-for="error in errors" :key="error" class="text-danger">*{{ error }}</p>
                     </div>
                 </div>
             </div>

@@ -20,5 +20,5 @@ Route::post('logout', [LoginController::class, 'logout']);
 Route::post('/register', [RegisterController::class, 'register']);
 
 Route::get('/{any}', function () {
-    return view('app');
+    return view('welcome');
 })->where('any','.*');

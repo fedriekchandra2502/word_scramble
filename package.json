@@ -1,4 +1,5 @@
 {
+    "name": "word_scramble",
     "private": true,
     "scripts": {
         "dev": "npm run development",

@@ -1,6 +1,8 @@
 <template>
     <div class="container">
-        <div class="spinner-border"></div>
+        <div class="row justify-content-center">
+            <div class="spinner-border"></div>
+        </div>
     </div>
 </template>
 

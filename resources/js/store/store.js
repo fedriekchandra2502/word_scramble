@@ -78,10 +78,10 @@ export const store = new Vuex.Store({
                 })
             })
         },
-        register(context) {
+        register(context, formData) {
             return new Promise((resolve, reject) => {
                 axios.get('/sanctum/csrf-cookie').then(res => {
-                    axios.post('/register',this.formData).then(res => {
+                    axios.post('/register',formData).then(res => {
                         console.log(res);
                         let user = {
                             id: res.data.user.id,

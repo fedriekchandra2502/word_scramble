@@ -56,7 +56,7 @@ export default {
     },
     methods: {
         register() {
-            this.$store.dispatch('register')
+            this.$store.dispatch('register',this.formData)
             .then(res => {
                 this.$router.push({name: 'dashboard'});
             })

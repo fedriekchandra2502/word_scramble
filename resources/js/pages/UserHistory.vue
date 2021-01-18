@@ -19,7 +19,7 @@
                     <td>{{ history.question }}</td>
                     <td>{{ history.hints }}</td>
                     <td>{{ history.answer }}</td>
-                    <td>{{ history.status }}</td>
+                    <td>{{ history.status? true : false }}</td>
                     <td>{{ history.points }}</td>
                 </tr>
             </tbody>

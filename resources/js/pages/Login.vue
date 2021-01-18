@@ -22,7 +22,8 @@
                             </div>
                             <div class="form-group row mb-0">
                                 <div class="col-md-8 offset-md-4">
-                                    <button type="submit" class="btn btn-primary">Login</button>
+                                    <button v-if="!loading" type="submit" class="btn btn-primary">Login</button>
+                                    <div v-if="loading" class="spinner-border"></div>
                                 </div>
                             </div>
                         </form>
@@ -36,6 +37,7 @@
 export default {
     data() {
         return {
+            loading: false,
             error: '',
             formData: {
                 email: '',
@@ -45,11 +47,14 @@ export default {
     },
     methods: {
         login() {
+            this.loading = true
             this.$store.dispatch('login',this.formData)
             .then(res => {
+                this.loading = false
                 this.$router.push({name: 'dashboard'});
             })
             .catch(error => {
+                this.loading = false
                 this.error = error.response.data;
             })
         }

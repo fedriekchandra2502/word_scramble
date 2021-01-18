@@ -35,7 +35,7 @@ export default {
         }
     },
     mounted() {
-        axios.get('/api/myhistory').then(res => {
+        axios.get('/api/myhistory', this.$store.getters.config).then(res => {
             console.log(res.data)
             this.histories = res.data
         })

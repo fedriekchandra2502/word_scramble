@@ -19,7 +19,7 @@ export default {
         }
     },
     mounted() {
-        axios.get('/api/users').then(res => {
+        axios.get('/api/users', this.$store.getters.config).then(res => {
             this.users = res.data
             console.log(this.users)
         })

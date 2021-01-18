@@ -35,7 +35,7 @@ export default {
         }
     },
     mounted() {
-        axios.get('/api/history/'+this.$route.params.id).then(res => {
+        axios.get('/api/history/'+this.$route.params.id, this.$store.getters.config).then(res => {
             this.histories = res.data
         })
     }

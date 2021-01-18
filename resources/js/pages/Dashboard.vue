@@ -77,7 +77,7 @@ export default {
                 question: this.question.question,
                 answer: this.answer
             }
-            axios.post('/api/guess', myAnswer).then(res => {
+            axios.post('/api/guess', myAnswer, this.$store.getters.config).then(res => {
                 this.profile.score = res.data.data.score;
                 this.loading = false;
                 this.playing = false;
@@ -88,7 +88,7 @@ export default {
             this.answer = ''
             this.loading = true
             this.playing = true
-            axios.get('/api/generate_question').then(res => {
+            axios.get('/api/generate_question', this.$store.getters.config).then(res => {
                 this.question.id = res.data.id
                 this.question.question = res.data.question
                 this.question.hint = res.data.hint
@@ -99,7 +99,7 @@ export default {
         }
     },
     mounted() {
-        axios.get('/api/generate_question').then(res => {
+        axios.get('/api/generate_question', this.$store.getters.config).then(res => {
             this.question.id = res.data.id
             this.question.question = res.data.question
             this.question.hint = res.data.hint
@@ -107,7 +107,7 @@ export default {
             this.length = res.data.question.length
             this.loading = false
         })
-        axios.get('/api/user').then(res => {
+        axios.get('/api/user', this.$store.getters.config).then(res => {
             this.profile.name = res.data.name
             this.profile.email = res.data.email
             this.profile.score = res.data.score

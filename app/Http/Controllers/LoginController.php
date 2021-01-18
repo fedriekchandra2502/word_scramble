@@ -18,8 +18,10 @@ class LoginController extends Controller
         $credentials = $request->only(['email','password']);
         if(Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            $token = Auth::user()->createToken(Auth::user()->email)->plainTextToken;
+            $user = Auth::user();
 
-            return response()->json(Auth::user(),200);
+            return response()->json(['user' => $user, 'token' => $token],200);
         }
 
         return response()->json('The provided credentials are incorrect',401);
@@ -30,6 +32,7 @@ class LoginController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'logged out successfully']);
     }

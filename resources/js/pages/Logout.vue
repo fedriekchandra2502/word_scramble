@@ -1,6 +1,6 @@
 <template>
-    <div>
-
+    <div class="container">
+        <div class="spinner-border"></div>
     </div>
 </template>
 

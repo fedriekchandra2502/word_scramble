@@ -2027,7 +2027,7 @@ __webpack_require__.r(__webpack_exports__);
         question: this.question.question,
         answer: this.answer
       };
-      axios.post('/api/guess', myAnswer).then(function (res) {
+      axios.post('/api/guess', myAnswer, this.$store.getters.config).then(function (res) {
         _this.profile.score = res.data.data.score;
         _this.loading = false;
         _this.playing = false;
@@ -2040,7 +2040,7 @@ __webpack_require__.r(__webpack_exports__);
       this.answer = '';
       this.loading = true;
       this.playing = true;
-      axios.get('/api/generate_question').then(function (res) {
+      axios.get('/api/generate_question', this.$store.getters.config).then(function (res) {
         _this2.question.id = res.data.id;
         _this2.question.question = res.data.question;
         _this2.question.hint = res.data.hint;
@@ -2053,7 +2053,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this3 = this;
 
-    axios.get('/api/generate_question').then(function (res) {
+    axios.get('/api/generate_question', this.$store.getters.config).then(function (res) {
       _this3.question.id = res.data.id;
       _this3.question.question = res.data.question;
       _this3.question.hint = res.data.hint;
@@ -2061,7 +2061,7 @@ __webpack_require__.r(__webpack_exports__);
       _this3.length = res.data.question.length;
       _this3.loading = false;
     });
-    axios.get('/api/user').then(function (res) {
+    axios.get('/api/user', this.$store.getters.config).then(function (res) {
       _this3.profile.name = res.data.name;
       _this3.profile.email = res.data.email;
       _this3.profile.score = res.data.score;
@@ -2116,9 +2116,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
+      loading: false,
       error: '',
       formData: {
         email: '',
@@ -2130,11 +2132,15 @@ __webpack_require__.r(__webpack_exports__);
     login: function login() {
       var _this = this;
 
+      this.loading = true;
       this.$store.dispatch('login', this.formData).then(function (res) {
+        _this.loading = false;
+
         _this.$router.push({
           name: 'dashboard'
         });
       })["catch"](function (error) {
+        _this.loading = false;
         _this.error = error.response.data;
       });
     }
@@ -2223,7 +2229,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get('/api/myhistory').then(function (res) {
+    axios.get('/api/myhistory', this.$store.getters.config).then(function (res) {
       console.log(res.data);
       _this.histories = res.data;
     });
@@ -2362,7 +2368,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get('/api/history/' + this.$route.params.id).then(function (res) {
+    axios.get('/api/history/' + this.$route.params.id, this.$store.getters.config).then(function (res) {
       _this.histories = res.data;
     });
   }
@@ -2403,7 +2409,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    axios.get('/api/users').then(function (res) {
+    axios.get('/api/users', this.$store.getters.config).then(function (res) {
       _this.users = res.data;
       console.log(_this.users);
     });
@@ -2677,6 +2683,7 @@ vue__WEBPACK_IMPORTED_MODULE_1__.default.use((vuex__WEBPACK_IMPORTED_MODULE_2___
 var store = new (vuex__WEBPACK_IMPORTED_MODULE_2___default().Store)({
   state: {
     user: JSON.parse(localStorage.getItem("user")) || null,
+    token: localStorage.getItem('access-token') || null,
     admin: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).status : 0
   },
   getters: {
@@ -2685,11 +2692,20 @@ var store = new (vuex__WEBPACK_IMPORTED_MODULE_2___default().Store)({
     },
     isAdmin: function isAdmin(state) {
       return state.admin;
+    },
+    config: function config(state) {
+      var config = {
+        headers: {
+          Authorization: 'Bearer ' + state.token
+        }
+      };
+      return config;
     }
   },
   mutations: {
     login: function login(state) {
       state.user = localStorage.getItem("user");
+      state.token = localStorage.getItem("access-token");
       state.admin = JSON.parse(localStorage.getItem("user")).status;
     },
     logout: function logout(state) {
@@ -2702,12 +2718,14 @@ var store = new (vuex__WEBPACK_IMPORTED_MODULE_2___default().Store)({
         axios__WEBPACK_IMPORTED_MODULE_0___default().get('/sanctum/csrf-cookie').then(function (resp) {
           axios__WEBPACK_IMPORTED_MODULE_0___default().post('/login', credentials).then(function (res) {
             var user = {
-              id: res.data.id,
-              name: res.data.name,
-              email: res.data.email,
-              status: res.data.admin
+              id: res.data.user.id,
+              name: res.data.user.name,
+              email: res.data.user.email,
+              status: res.data.user.admin
             };
+            var $token = res.data.token;
             localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("access-token", $token);
             context.commit('login');
             resolve(res);
           })["catch"](function (error) {
@@ -2722,10 +2740,12 @@ var store = new (vuex__WEBPACK_IMPORTED_MODULE_2___default().Store)({
       return new Promise(function (resolve, reject) {
         axios__WEBPACK_IMPORTED_MODULE_0___default().post('/logout').then(function (res) {
           localStorage.removeItem('user');
+          localStorage.removeItem('access-token');
           context.commit('logout');
           resolve(res);
         })["catch"](function (error) {
           localStorage.removeItem('user');
+          localStorage.removeItem('access-token');
           context.commit('logout');
           reject(error);
         });
@@ -2739,11 +2759,14 @@ var store = new (vuex__WEBPACK_IMPORTED_MODULE_2___default().Store)({
           axios__WEBPACK_IMPORTED_MODULE_0___default().post('/register', _this.formData).then(function (res) {
             console.log(res);
             var user = {
-              id: res.data.id,
-              name: res.data.name,
-              email: res.data.email
+              id: res.data.user.id,
+              name: res.data.user.name,
+              email: res.data.user.email,
+              status: res.data.user.admin
             };
+            var $token = res.data.token;
             localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("access-token", $token);
             context.commit('login');
             resolve(res);
           })["catch"](function (error) {
@@ -39717,7 +39740,24 @@ var render = function() {
                   ])
                 ]),
                 _vm._v(" "),
-                _vm._m(0)
+                _c("div", { staticClass: "form-group row mb-0" }, [
+                  _c("div", { staticClass: "col-md-8 offset-md-4" }, [
+                    !_vm.loading
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            attrs: { type: "submit" }
+                          },
+                          [_vm._v("Login")]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm.loading
+                      ? _c("div", { staticClass: "spinner-border" })
+                      : _vm._e()
+                  ])
+                ])
               ]
             )
           ])
@@ -39726,22 +39766,7 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group row mb-0" }, [
-      _c("div", { staticClass: "col-md-8 offset-md-4" }, [
-        _c(
-          "button",
-          { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-          [_vm._v("Login")]
-        )
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -56844,7 +56869,7 @@ module.exports = index_cjs;
 /******/ 			return checkDeferredModules();
 /******/ 		}
 /******/ 		
-/******/ 		var chunkLoadingGlobal = self["webpackChunk"] = self["webpackChunk"] || [];
+/******/ 		var chunkLoadingGlobal = self["webpackChunkword_scramble"] = self["webpackChunkword_scramble"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 		

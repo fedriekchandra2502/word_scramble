@@ -36,6 +36,7 @@
                                 </div>
                             </div>
                         </form>
+                        <p v-for="error in errors" :key="error" class="text-danger">{{ error }}</p>
                     </div>
                 </div>
             </div>
@@ -51,7 +52,8 @@ export default {
                 email: '',
                 password: '',
                 password_confirmation: ''
-            }
+            },
+            errors: []
         }
     },
     methods: {
@@ -59,6 +61,14 @@ export default {
             this.$store.dispatch('register',this.formData)
             .then(res => {
                 this.$router.push({name: 'dashboard'});
+            })
+            .catch(error => {
+                this.errors = []
+                Object.entries(error.response.data.errors).forEach(err => {
+                    err[1].forEach(message => {
+                        this.errors.push(message)
+                    })
+                });
             })
         }
     }
